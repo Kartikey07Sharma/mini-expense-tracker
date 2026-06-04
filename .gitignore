@@ -4,6 +4,9 @@ node_modules/
 # Environment Variables
 .env
 
+# Database
+expense-tracker.db
+
 # Build Files
 dist/
 build/
