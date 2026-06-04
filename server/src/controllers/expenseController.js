@@ -43,16 +43,50 @@ const createExpense = (req, res) => {
 
 const getExpenses = (req, res) => {
     try {
+
+        const {
+            category,
+            startDate,
+            endDate
+        } = req.query;
+
+        let query = `
+            SELECT *
+            FROM expenses
+            WHERE 1=1
+        `;
+
+        const params = [];
+
+        if (category) {
+            query += ` AND category = ?`;
+            params.push(category);
+        }
+
+        if (startDate) {
+            query += ` AND date >= ?`;
+            params.push(startDate);
+        }
+
+        if (endDate) {
+            query += ` AND date <= ?`;
+            params.push(endDate);
+        }
+
+        query += ` ORDER BY date DESC`;
+
         const expenses = db
-            .prepare(`
-        SELECT *
-        FROM expenses
-        ORDER BY date DESC
-      `)
-            .all();
+            .prepare(query)
+            .all(...params);
 
         res.status(200).json({
             success: true,
+            count: expenses.length,
+            filters: {
+                category: category || null,
+                startDate: startDate || null,
+                endDate: endDate || null
+            },
             data: expenses
         });
 
@@ -151,28 +185,45 @@ const getExpenseSummary = (req, res) => {
     try {
 
         const totalExpenses = db.prepare(`
-      SELECT COALESCE(SUM(amount),0) AS total
-      FROM expenses
-    `).get();
+            SELECT COALESCE(SUM(amount), 0) AS total
+            FROM expenses
+        `).get();
 
         const highestExpense = db.prepare(`
-      SELECT COALESCE(MAX(amount),0) AS highest
-      FROM expenses
-    `).get();
+            SELECT COALESCE(MAX(amount), 0) AS highest
+            FROM expenses
+        `).get();
+
+        const averageExpense = db.prepare(`
+            SELECT COALESCE(AVG(amount), 0) AS average
+            FROM expenses
+        `).get();
 
         const categoryBreakdown = db.prepare(`
-      SELECT
-        category,
-        SUM(amount) AS total
-      FROM expenses
-      GROUP BY category
-    `).all();
+            SELECT
+                category,
+                SUM(amount) AS total
+            FROM expenses
+            GROUP BY category
+            ORDER BY total DESC
+        `).all();
+
+        const recentExpenses = db.prepare(`
+            SELECT *
+            FROM expenses
+            ORDER BY created_at DESC
+            LIMIT 5
+        `).all();
 
         res.status(200).json({
             success: true,
             totalExpenses: totalExpenses.total,
             highestExpense: highestExpense.highest,
-            categoryBreakdown
+            averageExpense: Number(
+                averageExpense.average
+            ).toFixed(2),
+            categoryBreakdown,
+            recentExpenses
         });
 
     } catch (error) {

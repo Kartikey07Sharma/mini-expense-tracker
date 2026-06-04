@@ -1,4 +1,4 @@
-const validateExpense = (req, res, next) => {
+const validateCreateExpense = (req, res, next) => {
     const { amount, category, date } = req.body;
 
     if (!amount) {
@@ -44,4 +44,4 @@ const validateExpense = (req, res, next) => {
     next();
 };
 
-module.exports = validateExpense;
+module.exports = validateCreateExpense;
