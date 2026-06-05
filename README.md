@@ -2,15 +2,15 @@
 
 A full-stack expense management application built using React, Node.js, Express.js, and SQLite.
 
-The application helps users track daily expenses, organize spending by category, analyze expenditure patterns, and gain insights through summaries and visualizations. It provides a simple and intuitive interface for managing personal expenses while demonstrating modern full-stack development practices.
+The application helps users track daily expenses, organize spending by category, analyze expenditure patterns, and gain insights through summaries and visualizations. It provides a modern dashboard interface for managing personal finances while demonstrating full-stack software engineering practices, clean architecture principles, and responsive user experience design.
 
 This project is being developed as part of the Studio Graphene Associate Software Engineer Assessment.
 
 ---
 
-## Features
+# Features
 
-### Expense Management
+## Expense Management
 
 * Add new expenses
 * View all expenses
@@ -19,14 +19,14 @@ This project is being developed as part of the Studio Graphene Associate Softwar
 * Store expense amount, category, date, and notes
 * Persistent data storage using SQLite
 
-### Filtering and Search
+## Filtering and Search
 
 * Filter expenses by category
 * Filter expenses by date range
 * Combine multiple filters
 * Clear and reset filters
 
-### Analytics and Reporting
+## Analytics and Reporting
 
 * Total spending summary
 * Highest expense tracking
@@ -36,35 +36,37 @@ This project is being developed as part of the Studio Graphene Associate Softwar
 * Expense distribution visualization
 * Spending insights dashboard
 
-### Data Validation
+## Data Validation
 
 * Amount must be greater than zero
-* Category selection validation
+* Category validation
 * Date validation
 * Prevention of future dates
 * Client-side validation
 * Server-side validation
 
-### User Experience
+## User Experience
 
 * Responsive user interface
 * Currency formatting
 * Loading states
 * Error handling
-* Confirmation dialogs for destructive actions
-* Clean and intuitive design
+* Retry mechanisms
+* Confirmation dialogs
+* Modern SaaS-inspired dashboard
 
-### Data Visualization
+## Data Visualization
 
 * Category-wise expense charts
 * Spending distribution graphs
 * Summary cards and statistics
+* Interactive dashboard analytics
 
 ---
 
-## Tech Stack
+# Tech Stack
 
-### Frontend
+## Frontend
 
 * React
 * Vite
@@ -72,17 +74,17 @@ This project is being developed as part of the Studio Graphene Associate Softwar
 * Recharts
 * CSS
 
-### Backend
+## Backend
 
 * Node.js
 * Express.js
 
-### Database
+## Database
 
 * SQLite
 * Better-SQLite3
 
-### Development Tools
+## Development Tools
 
 * Git
 * GitHub
@@ -92,9 +94,9 @@ This project is being developed as part of the Studio Graphene Associate Softwar
 
 ---
 
-## Backend Architecture
+# Backend Architecture
 
-The backend follows a modular architecture based on separation of concerns. Each layer is responsible for a specific aspect of the application, making the codebase easier to maintain, extend, and test.
+The backend follows a modular architecture based on separation of concerns. Each layer is responsible for a specific responsibility, making the application easier to maintain, test, and scale.
 
 ```text
 server/
@@ -114,9 +116,9 @@ server/
 └── expense-tracker.db
 ```
 
-### Controllers
+## Controllers
 
-Controllers handle incoming HTTP requests, execute business logic, interact with the database, and return structured responses.
+Controllers manage incoming HTTP requests and return structured responses.
 
 Implemented controllers:
 
@@ -126,9 +128,9 @@ Implemented controllers:
 * Delete Expense
 * Expense Summary
 
-### Middleware
+## Middleware
 
-Validation middleware ensures that only valid data reaches the application logic.
+Validation middleware ensures only valid data reaches the application logic.
 
 Implemented validation:
 
@@ -138,16 +140,16 @@ Implemented validation:
 * Date validation
 * Future date restriction
 
-Separate middleware is used for:
+Separate validation middleware:
 
-* Expense Creation
-* Expense Updates
+* Expense Creation Validation
+* Expense Update Validation
 
-### Database Layer
+## Database Layer
 
-SQLite is used as the application's persistence layer because it is lightweight, fast, and easy to set up.
+SQLite is used as the application's persistence layer.
 
-The database stores:
+Stored information:
 
 * Expense Amount
 * Category
@@ -158,9 +160,9 @@ The database stores:
 
 ---
 
-## Database Schema
+# Database Schema
 
-### Expenses Table
+## Expenses Table
 
 | Column     | Type     | Description           |
 | ---------- | -------- | --------------------- |
@@ -174,9 +176,9 @@ The database stores:
 
 ---
 
-## REST API Endpoints
+# REST API Endpoints
 
-### Create Expense
+## Create Expense
 
 ```http
 POST /api/expenses
@@ -184,7 +186,7 @@ POST /api/expenses
 
 Creates a new expense record.
 
-### Get All Expenses
+## Get All Expenses
 
 ```http
 GET /api/expenses
@@ -192,7 +194,7 @@ GET /api/expenses
 
 Returns all stored expenses.
 
-### Filter By Category
+## Filter By Category
 
 ```http
 GET /api/expenses?category=Food
@@ -200,15 +202,15 @@ GET /api/expenses?category=Food
 
 Returns expenses belonging to a specific category.
 
-### Filter By Date Range
+## Filter By Date Range
 
 ```http
 GET /api/expenses?startDate=2026-06-01&endDate=2026-06-30
 ```
 
-Returns expenses within the selected date range.
+Returns expenses within a specified date range.
 
-### Combined Filtering
+## Combined Filtering
 
 ```http
 GET /api/expenses?category=Food&startDate=2026-06-01&endDate=2026-06-30
@@ -216,7 +218,7 @@ GET /api/expenses?category=Food&startDate=2026-06-01&endDate=2026-06-30
 
 Returns expenses matching multiple filter conditions.
 
-### Update Expense
+## Update Expense
 
 ```http
 PUT /api/expenses/:id
@@ -224,7 +226,7 @@ PUT /api/expenses/:id
 
 Updates an existing expense.
 
-### Delete Expense
+## Delete Expense
 
 ```http
 DELETE /api/expenses/:id
@@ -232,7 +234,7 @@ DELETE /api/expenses/:id
 
 Deletes an expense record.
 
-### Expense Summary
+## Expense Summary
 
 ```http
 GET /api/expenses/summary
@@ -248,7 +250,88 @@ Returns:
 
 ---
 
-## Project Structure
+# Frontend Development Progress
+
+## Dashboard Foundation Completed
+
+The frontend has been initialized using React and Vite.
+
+A modern SaaS-inspired dashboard architecture has been created with emphasis on scalability, maintainability, responsiveness, and user experience.
+
+## Implemented Features
+
+### Dashboard Layout
+
+* Responsive dashboard structure
+* Gradient hero section
+* Dashboard overview section
+* Modern SaaS-inspired design
+* Mobile-friendly layout
+
+### Summary Cards
+
+* Total Expenses card
+* Highest Expense card
+* Average Expense card
+* Loading skeleton states
+* Currency formatting support
+* Responsive card grid
+
+### API Integration Layer
+
+A centralized Axios service layer has been implemented.
+
+Supported operations:
+
+* Fetch all expenses
+* Create expense
+* Update expense
+* Delete expense
+* Fetch expense summary
+
+### State Management
+
+* Dashboard data fetching
+* Loading state handling
+* Error handling
+* Retry functionality
+* Concurrent API requests using Promise.all()
+
+### User Experience Enhancements
+
+* Loading skeleton animations
+* Error alert system
+* Retry mechanism
+* Responsive dashboard cards
+* Hover animations
+* Glassmorphism-inspired card design
+
+---
+
+# Current Frontend Architecture
+
+```text
+client/
+│
+├── src/
+│   ├── api/
+│   │   └── expenseApi.js
+│   │
+│   ├── components/
+│   │   └── SummaryCards/
+│   │
+│   ├── pages/
+│   │   └── Dashboard.jsx
+│   │
+│   ├── styles/
+│   │
+│   ├── App.jsx
+│   └── main.jsx
+```
+
+---
+
+# Project Structure
 
 ```text
 mini-expense-tracker/
@@ -277,9 +360,9 @@ mini-expense-tracker/
 
 ---
 
-## Current Development Status
+# Current Development Status
 
-### Completed
+## Completed
 
 * Project initialization
 * Git repository setup
@@ -292,59 +375,92 @@ mini-expense-tracker/
 * Date range filtering
 * Expense analytics
 * Summary reporting APIs
+* Backend API testing using Postman
+* Frontend dashboard foundation
+* API integration layer
+* Summary cards implementation
 * GitHub integration
 
-### In Progress
+## In Progress
 
-* Backend API testing
-* Edge case validation
-* Postman collection creation
+* Expense Creation Form
+* Expense Filtering Interface
+* Expense Table Component
+* Analytics Charts Integration
+* Recent Activity Timeline
 
-### Upcoming
+## Upcoming
 
-* React frontend implementation
-* Expense management interface
-* Dashboard development
-* Charts and visualizations
-* Responsive UI design
+* Expense editing workflow
+* Expense deletion workflow
+* Advanced analytics dashboard
+* Final UI polish
+* Responsive testing
 * Deployment
 
 ---
 
-## Installation
+# Installation
 
-### Clone Repository
+## Clone Repository
 
 ```bash
 git clone <repository-url>
 ```
 
-### Install Backend Dependencies
+## Install Backend Dependencies
 
 ```bash
 cd server
 npm install
 ```
 
-### Start Backend Server
+## Start Backend Server
 
 ```bash
 npm run dev
 ```
 
-Backend server runs on:
+Backend Server:
 
 ```text
 http://localhost:5000
 ```
 
-### Frontend Setup
+## Install Frontend Dependencies
 
-Frontend implementation is currently under development and will be added in upcoming commits.
+```bash
+cd client
+npm install
+```
+
+## Start Frontend Development Server
+
+```bash
+npm run dev
+```
+
+Frontend Server:
+
+```text
+http://localhost:5173
+```
 
 ---
 
-## Design Principles
+# Application Screenshots
+
+## Dashboard
+
+Screenshots will be added after frontend implementation is completed.
+
+## Analytics
+
+Analytics and chart screenshots will be added after chart integration.
+
+---
+
+# Design Principles
 
 This project emphasizes:
 
@@ -355,14 +471,14 @@ This project emphasizes:
 * Separation of Concerns
 * RESTful API Design
 * Data Validation
-* User Experience
+* Responsive User Experience
 * Production-Oriented Development Practices
 
 The goal is not only to satisfy the assignment requirements but also to demonstrate software engineering principles that can be applied in real-world applications.
 
 ---
 
-## Author
+# Author
 
 **Kartikey Sharma**
 
