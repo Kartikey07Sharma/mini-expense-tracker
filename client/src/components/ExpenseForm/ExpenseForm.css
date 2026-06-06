@@ -1,0 +1,208 @@
+.expense-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.expense-form__banner {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.875rem 1rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.expense-form__banner svg {
+  flex-shrink: 0;
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.expense-form__banner--success {
+  border: 1px solid rgba(74, 222, 128, 0.35);
+  background: rgba(74, 222, 128, 0.1);
+  color: #4ade80;
+}
+
+.expense-form__banner--error {
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  background: var(--color-error-bg);
+  color: var(--color-error);
+}
+
+.expense-form__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.expense-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.expense-form__field--full {
+  grid-column: 1 / -1;
+}
+
+.expense-form__label {
+  color: var(--color-text);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.expense-form__required {
+  color: var(--color-primary);
+}
+
+.expense-form__optional {
+  margin-left: 0.375rem;
+  color: var(--color-text-secondary);
+  font-weight: 400;
+}
+
+.expense-form__input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.expense-form__prefix {
+  position: absolute;
+  left: 0.875rem;
+  color: var(--color-text-secondary);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+.expense-form__input {
+  width: 100%;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.45);
+  color: var(--color-text);
+  font-size: 0.9375rem;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.expense-form__input--amount {
+  padding-left: 2rem;
+}
+
+.expense-form__input::placeholder {
+  color: rgba(148, 163, 184, 0.65);
+}
+
+.expense-form__input:hover:not(:disabled) {
+  border-color: rgba(139, 92, 246, 0.4);
+  background: rgba(15, 23, 42, 0.6);
+}
+
+.expense-form__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.18);
+  background: rgba(15, 23, 42, 0.65);
+}
+
+.expense-form__input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.expense-form__select {
+  appearance: none;
+  padding-right: 2.25rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.875rem center;
+  cursor: pointer;
+}
+
+.expense-form__select option {
+  background: var(--color-card);
+  color: var(--color-text);
+}
+
+.expense-form__textarea {
+  resize: vertical;
+  min-height: 88px;
+  line-height: 1.5;
+}
+
+.expense-form__field--error .expense-form__input {
+  border-color: rgba(248, 113, 113, 0.6);
+}
+
+.expense-form__field--error .expense-form__input:focus {
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.15);
+}
+
+.expense-form__error {
+  margin: 0;
+  color: var(--color-error);
+  font-size: 0.8125rem;
+}
+
+.expense-form__submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.875rem 1.25rem;
+  border: none;
+  border-radius: 12px;
+  background: var(--gradient-primary);
+  color: #fff;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.expense-form__submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.45);
+}
+
+.expense-form__submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.expense-form__submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.expense-form__spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: expense-form-spin 0.7s linear infinite;
+}
+
+@keyframes expense-form-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .expense-form__grid {
+    grid-template-columns: 1fr;
+  }
+}

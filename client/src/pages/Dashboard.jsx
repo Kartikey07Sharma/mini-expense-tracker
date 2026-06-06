@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getExpenseSummary, getExpenses } from '../api/expenseApi';
 import SummaryCards from '../components/SummaryCards/SummaryCards';
+import ExpenseForm from '../components/ExpenseForm/ExpenseForm';
+import ExpenseList from '../components/ExpenseList/ExpenseList';
 import './Dashboard.css';
 
 function Dashboard() {
@@ -129,7 +131,7 @@ function Dashboard() {
             <h2 className="dashboard-panel__title">Add Expense</h2>
             <p className="dashboard-panel__subtitle">Record a new transaction</p>
           </div>
-          <p className="dashboard__placeholder-text">Expense form coming next</p>
+          <ExpenseForm onExpenseCreated={fetchDashboardData} />
         </section>
 
         <section className="dashboard-panel dashboard-panel--chart">
@@ -154,7 +156,7 @@ function Dashboard() {
           <h2 className="dashboard-panel__title">All Expenses</h2>
           <p className="dashboard-panel__subtitle">Manage your transactions</p>
         </div>
-        <p className="dashboard__placeholder-text">Expense table coming next</p>
+        <ExpenseList onExpenseChanged={fetchDashboardData} />
       </section>
 
       <div className="dashboard__analytics-grid">
