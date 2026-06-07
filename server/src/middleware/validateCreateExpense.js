@@ -29,14 +29,9 @@ const validateCreateExpense = (req, res, next) => {
         });
     }
 
-    const today = new Date();
-
-    const todayString =
-        today.getFullYear() +
-        "-" +
-        String(today.getMonth() + 1).padStart(2, "0") +
-        "-" +
-        String(today.getDate()).padStart(2, "0");
+    const todayString = new Date().toLocaleDateString("en-CA", {
+        timeZone: "Asia/Kolkata"
+    });
 
     console.log("Received Date:", date);
     console.log("Today String:", todayString);
