@@ -179,10 +179,9 @@ function Dashboard() {
             </span>
           </div>
 
-          <h1 className="dashboard-hero__title">Expense Tracker Dashboard</h1>
+          <h1 className="dashboard-hero__title">PayTrack</h1>
           <p className="dashboard-hero__description">
-            Manage, analyze and monitor your spending from a single intelligent
-            dashboard.
+             Smart expense analytics dashboard to track, manage and analyze your spending with real-time insights.
           </p>
 
           <div className="dashboard-hero__stats">

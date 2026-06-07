@@ -63,11 +63,9 @@ function ExpenseForm({ onExpenseCreated, onShowToast }) {
     if (!form.date) {
       nextErrors.date = 'Date is required.';
     } else {
-      const selectedDate = new Date(form.date);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const todayString = getTodayDate();
 
-      if (selectedDate > today) {
+      if (form.date > todayString) {
         nextErrors.date = 'Future dates are not allowed.';
       }
     }
@@ -131,9 +129,8 @@ function ExpenseForm({ onExpenseCreated, onShowToast }) {
 
       <div className="expense-form__grid">
         <div
-          className={`expense-form__field ${
-            errors.amount ? 'expense-form__field--error' : ''
-          }`}
+          className={`expense-form__field ${errors.amount ? 'expense-form__field--error' : ''
+            }`}
         >
           <label className="expense-form__label" htmlFor="amount">
             Amount <span className="expense-form__required">*</span>
@@ -160,9 +157,8 @@ function ExpenseForm({ onExpenseCreated, onShowToast }) {
         </div>
 
         <div
-          className={`expense-form__field ${
-            errors.category ? 'expense-form__field--error' : ''
-          }`}
+          className={`expense-form__field ${errors.category ? 'expense-form__field--error' : ''
+            }`}
         >
           <label className="expense-form__label" htmlFor="category">
             Category <span className="expense-form__required">*</span>
@@ -188,9 +184,8 @@ function ExpenseForm({ onExpenseCreated, onShowToast }) {
         </div>
 
         <div
-          className={`expense-form__field ${
-            errors.date ? 'expense-form__field--error' : ''
-          }`}
+          className={`expense-form__field ${errors.date ? 'expense-form__field--error' : ''
+            }`}
         >
           <label className="expense-form__label" htmlFor="date">
             Date <span className="expense-form__required">*</span>
