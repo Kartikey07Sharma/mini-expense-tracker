@@ -29,12 +29,19 @@ const validateCreateExpense = (req, res, next) => {
         });
     }
 
-    const expenseDate = new Date(date);
     const today = new Date();
 
-    today.setHours(0, 0, 0, 0);
+    const todayString =
+        today.getFullYear() +
+        "-" +
+        String(today.getMonth() + 1).padStart(2, "0") +
+        "-" +
+        String(today.getDate()).padStart(2, "0");
 
-    if (expenseDate > today) {
+    console.log("Received Date:", date);
+    console.log("Today String:", todayString);
+
+    if (date > todayString) {
         return res.status(400).json({
             success: false,
             message: "Future dates are not allowed"
