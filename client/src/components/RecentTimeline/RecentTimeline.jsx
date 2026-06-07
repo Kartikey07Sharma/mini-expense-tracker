@@ -1,4 +1,5 @@
 import { formatCurrency } from '../../utils/formatCurrency';
+import EmptyState from '../EmptyState/EmptyState';
 import './RecentTimeline.css';
 
 const CATEGORY_ICONS = {
@@ -32,6 +33,7 @@ function RecentTimeline({ expenses, loading }) {
             <div className="timeline__content">
               <div className="timeline__skeleton timeline__skeleton--title" />
               <div className="timeline__skeleton timeline__skeleton--meta" />
+              <div className="timeline__skeleton timeline__skeleton--note" />
             </div>
           </div>
         ))}
@@ -41,16 +43,11 @@ function RecentTimeline({ expenses, loading }) {
 
   if (!expenses?.length) {
     return (
-      <div className="timeline timeline--empty">
-        <div className="timeline__empty-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <circle cx="12" cy="12" r="10" />
-            <polyline points="12 6 12 12 16 14" />
-          </svg>
-        </div>
-        <p className="timeline__empty-title">No recent activity</p>
-        <p className="timeline__empty-text">Expenses matching your filters will appear here.</p>
-      </div>
+      <EmptyState
+        icon="🕒"
+        title="No expenses found"
+        description="Create your first expense to start tracking your spending."
+      />
     );
   }
 

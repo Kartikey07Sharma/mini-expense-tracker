@@ -35,6 +35,18 @@
   height: 220px;
 }
 
+.charts__skeleton--line {
+  width: 100%;
+  height: 220px;
+}
+
+.charts__skeleton--legend {
+  width: 60%;
+  height: 0.875rem;
+  margin-top: 1rem;
+  border-radius: 999px;
+}
+
 @keyframes charts-shimmer {
   0% {
     background-position: 200% 0;

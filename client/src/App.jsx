@@ -1,7 +1,12 @@
+import { ToastProvider } from './components/Toast/Toast';
 import Dashboard from './pages/Dashboard';
 
 function App() {
-  return <Dashboard />;
+  return (
+    <ToastProvider>
+      <Dashboard />
+    </ToastProvider>
+  );
 }
 
 export default App;

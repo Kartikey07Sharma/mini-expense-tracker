@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { updateExpense, deleteExpense } from '../../api/expenseApi';
 import { formatCurrency } from '../../utils/formatCurrency';
+import EmptyState from '../EmptyState/EmptyState';
 import './ExpenseList.css';
 
 const CATEGORIES = [
@@ -104,7 +105,7 @@ function EditModal({ expense, onClose, onSaved }) {
       const data = await updateExpense(expense.id, payload);
 
       if (data.success) {
-        onSaved(data.message || 'Expense updated successfully.');
+        onSaved();
       } else {
         setSubmitError(data.message || 'Failed to update expense.');
       }
@@ -288,38 +289,16 @@ function ExpenseList({
   error = '',
   onExpenseChanged,
   onRetry,
+  onShowToast,
 }) {
-  const [successMessage, setSuccessMessage] = useState('');
   const [actionError, setActionError] = useState('');
   const [editingExpense, setEditingExpense] = useState(null);
   const [deletingExpense, setDeletingExpense] = useState(null);
   const [deleting, setDeleting] = useState(false);
-  const successTimeoutRef = useRef(null);
 
-  useEffect(() => {
-    return () => {
-      if (successTimeoutRef.current) {
-        clearTimeout(successTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  const showSuccessMessage = (message) => {
-    setSuccessMessage(message);
-
-    if (successTimeoutRef.current) {
-      clearTimeout(successTimeoutRef.current);
-    }
-
-    successTimeoutRef.current = setTimeout(() => {
-      setSuccessMessage('');
-      successTimeoutRef.current = null;
-    }, 3000);
-  };
-
-  const handleUpdateSuccess = (message) => {
+  const handleUpdateSuccess = () => {
     setEditingExpense(null);
-    showSuccessMessage(message);
+    onShowToast?.('Expense updated successfully.', 'success');
     onExpenseChanged?.();
   };
 
@@ -334,16 +313,19 @@ function ExpenseList({
 
       if (data.success) {
         setDeletingExpense(null);
-        showSuccessMessage(data.message || 'Expense deleted successfully.');
+        onShowToast?.('Expense deleted successfully.', 'success');
         onExpenseChanged?.();
       } else {
         setActionError(data.message || 'Failed to delete expense.');
+        onShowToast?.(data.message || 'Failed to delete expense.', 'error');
         setDeletingExpense(null);
       }
     } catch (err) {
-      setActionError(
-        err.response?.data?.message || 'Something went wrong. Please try again.',
-      );
+      const message =
+        err.response?.data?.message || 'Something went wrong. Please try again.';
+
+      setActionError(message);
+      onShowToast?.(message, 'error');
       setDeletingExpense(null);
     } finally {
       setDeleting(false);
@@ -355,7 +337,7 @@ function ExpenseList({
   if (loading) {
     return (
       <div className="expense-list">
-        <div className="expense-list__table-wrap">
+        <div className="expense-list__table-wrap expense-list__table-wrap--loading">
           <table className="expense-list__table">
             <thead>
               <tr>
@@ -385,30 +367,6 @@ function ExpenseList({
 
   return (
     <div className="expense-list">
-      {successMessage && (
-        <div className="expense-list__banner expense-list__banner--success" role="status">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-            <polyline points="22 4 12 14.01 9 11.01" />
-          </svg>
-          <span>{successMessage}</span>
-          <button
-            type="button"
-            className="expense-list__banner-close"
-            onClick={() => {
-              if (successTimeoutRef.current) {
-                clearTimeout(successTimeoutRef.current);
-                successTimeoutRef.current = null;
-              }
-              setSuccessMessage('');
-            }}
-            aria-label="Dismiss"
-          >
-            ×
-          </button>
-        </div>
-      )}
-
       {displayError && (
         <div className="expense-list__banner expense-list__banner--error" role="alert">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -426,20 +384,11 @@ function ExpenseList({
       )}
 
       {!displayError && expenses.length === 0 ? (
-        <div className="expense-list__empty">
-          <div className="expense-list__empty-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
-              <rect x="9" y="3" width="6" height="4" rx="1" />
-              <line x1="9" y1="12" x2="15" y2="12" />
-              <line x1="9" y1="16" x2="13" y2="16" />
-            </svg>
-          </div>
-          <h3 className="expense-list__empty-title">No expenses found</h3>
-          <p className="expense-list__empty-text">
-            Start tracking your spending by adding your first expense above.
-          </p>
-        </div>
+        <EmptyState
+          icon="📋"
+          title="No expenses found"
+          description="Create your first expense to start tracking your spending."
+        />
       ) : (
         !displayError && (
           <div className="expense-list__table-wrap">

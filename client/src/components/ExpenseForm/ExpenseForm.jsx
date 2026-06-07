@@ -29,11 +29,10 @@ const INITIAL_FORM = {
   note: '',
 };
 
-function ExpenseForm({ onExpenseCreated }) {
+function ExpenseForm({ onExpenseCreated, onShowToast }) {
   const [form, setForm] = useState(INITIAL_FORM);
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
   const [submitError, setSubmitError] = useState('');
 
   const handleChange = (event) => {
@@ -45,7 +44,6 @@ function ExpenseForm({ onExpenseCreated }) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
 
-    if (successMessage) setSuccessMessage('');
     if (submitError) setSubmitError('');
   };
 
@@ -86,7 +84,6 @@ function ExpenseForm({ onExpenseCreated }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    setSuccessMessage('');
     setSubmitError('');
 
     if (!validate()) return;
@@ -104,7 +101,7 @@ function ExpenseForm({ onExpenseCreated }) {
       const data = await createExpense(payload);
 
       if (data.success) {
-        setSuccessMessage(data.message || 'Expense created successfully.');
+        onShowToast?.('Expense added successfully.', 'success');
         resetForm();
         onExpenseCreated?.();
       } else {
@@ -121,16 +118,6 @@ function ExpenseForm({ onExpenseCreated }) {
 
   return (
     <form className="expense-form" onSubmit={handleSubmit} noValidate>
-      {successMessage && (
-        <div className="expense-form__banner expense-form__banner--success" role="status">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-            <polyline points="22 4 12 14.01 9 11.01" />
-          </svg>
-          <span>{successMessage}</span>
-        </div>
-      )}
-
       {submitError && (
         <div className="expense-form__banner expense-form__banner--error" role="alert">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">

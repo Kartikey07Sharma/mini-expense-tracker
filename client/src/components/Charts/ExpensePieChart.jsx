@@ -7,6 +7,7 @@ import {
   Tooltip,
 } from 'recharts';
 import { formatCurrency } from '../../utils/formatCurrency';
+import EmptyState from '../EmptyState/EmptyState';
 import { getCategoryColor } from './chartConstants';
 import './Charts.css';
 
@@ -28,21 +29,18 @@ function ExpensePieChart({ data, loading }) {
     return (
       <div className="charts charts--loading" aria-label="Loading pie chart">
         <div className="charts__skeleton charts__skeleton--pie" />
+        <div className="charts__skeleton charts__skeleton--legend" />
       </div>
     );
   }
 
   if (!data?.length) {
     return (
-      <div className="charts charts--empty">
-        <div className="charts__empty-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M21 12a9 9 0 1 1-9-9" />
-            <path d="M21 3v9h-9" />
-          </svg>
-        </div>
-        <p className="charts__empty-title">No analytics data available</p>
-      </div>
+      <EmptyState
+        icon="📊"
+        title="No expenses found"
+        description="Create your first expense to start tracking your spending."
+      />
     );
   }
 

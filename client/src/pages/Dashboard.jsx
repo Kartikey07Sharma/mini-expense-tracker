@@ -6,19 +6,28 @@ import ExpenseList from '../components/ExpenseList/ExpenseList';
 import Filters from '../components/Filters/Filters';
 import ExpensePieChart from '../components/Charts/ExpensePieChart';
 import ExpenseBarChart from '../components/Charts/ExpenseBarChart';
+import MonthlyTrendChart from '../components/Charts/MonthlyTrendChart';
 import RecentTimeline from '../components/RecentTimeline/RecentTimeline';
+import InsightsPanel from '../components/Insights/InsightsPanel';
+import { useToast } from '../components/Toast/Toast';
+import { exportExpensesToCsv } from '../utils/exportCsv';
 import {
   INITIAL_FILTERS,
   buildApiFilters,
   buildCategoryBreakdown,
+  buildFilteredInsights,
+  buildGlobalInsights,
+  buildMonthlyTrend,
   getRecentExpenses,
   hasActiveFilters,
 } from '../utils/expenseUtils';
 import './Dashboard.css';
 
 function Dashboard() {
+  const { showToast } = useToast();
   const [summary, setSummary] = useState(null);
   const [expenses, setExpenses] = useState([]);
+  const [totalTransactionCount, setTotalTransactionCount] = useState(0);
   const [filters, setFilters] = useState(INITIAL_FILTERS);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -42,10 +51,17 @@ function Dashboard() {
     setError(null);
 
     try {
-      const [summaryData, expensesData] = await Promise.all([
+      const apiFilters = buildApiFilters(activeFilters);
+      const requests = [
         getExpenseSummary(),
-        getExpenses(buildApiFilters(activeFilters)),
-      ]);
+        getExpenses(apiFilters),
+      ];
+
+      if (hasActiveFilters(activeFilters)) {
+        requests.push(getExpenses());
+      }
+
+      const [summaryData, expensesData, allExpensesData] = await Promise.all(requests);
 
       if (summaryData.success) {
         setSummary(summaryData);
@@ -57,6 +73,16 @@ function Dashboard() {
         setExpenses(expensesData.data || []);
       } else {
         setError((prev) => prev || expensesData.message || 'Failed to load expenses.');
+      }
+
+      if (allExpensesData?.success) {
+        setTotalTransactionCount(
+          allExpensesData.count ?? allExpensesData.data?.length ?? 0,
+        );
+      } else if (expensesData.success && !hasActiveFilters(activeFilters)) {
+        setTotalTransactionCount(
+          expensesData.count ?? expensesData.data?.length ?? 0,
+        );
       }
     } catch (err) {
       const message =
@@ -75,19 +101,27 @@ function Dashboard() {
     fetchDashboardData(filters);
   }, [filters, fetchDashboardData]);
 
-  const handleFilterChange = (name, value) => {
+  const handleFilterChange = useCallback((name, value) => {
     setFilters((prev) => ({ ...prev, [name]: value }));
-  };
+  }, []);
 
-  const handleClearFilters = () => {
+  const handleClearFilters = useCallback(() => {
     setFilters(INITIAL_FILTERS);
-  };
+  }, []);
 
-  const handleDataChanged = () => {
+  const handleDataChanged = useCallback(() => {
     fetchDashboardData(filters, true);
-  };
+  }, [fetchDashboardData, filters]);
 
-  const expenseCount = expenses.length;
+  const handleExportCsv = useCallback(() => {
+    if (!expenses.length) {
+      showToast('No expenses available to export.', 'error');
+      return;
+    }
+
+    exportExpensesToCsv(expenses);
+    showToast('Export successful. expenses.csv downloaded.', 'success');
+  }, [expenses, showToast]);
 
   const chartBreakdown = useMemo(() => {
     if (hasActiveFilters(filters)) {
@@ -96,6 +130,11 @@ function Dashboard() {
 
     return summary?.categoryBreakdown || buildCategoryBreakdown(expenses);
   }, [expenses, summary, filters]);
+
+  const summaryBreakdown = useMemo(
+    () => summary?.categoryBreakdown || buildCategoryBreakdown(expenses),
+    [summary, expenses],
+  );
 
   const timelineExpenses = useMemo(() => {
     if (hasActiveFilters(filters)) {
@@ -106,6 +145,21 @@ function Dashboard() {
       ? summary.recentExpenses
       : getRecentExpenses(expenses);
   }, [expenses, summary, filters]);
+
+  const monthlyTrend = useMemo(
+    () => buildMonthlyTrend(expenses),
+    [expenses],
+  );
+
+  const insights = useMemo(() => {
+    if (hasActiveFilters(filters)) {
+      return buildFilteredInsights(expenses, chartBreakdown);
+    }
+
+    return buildGlobalInsights(summary, totalTransactionCount, summaryBreakdown);
+  }, [filters, expenses, chartBreakdown, summary, totalTransactionCount, summaryBreakdown]);
+
+  const expenseCount = expenses.length;
 
   return (
     <div className="dashboard">
@@ -180,7 +234,20 @@ function Dashboard() {
         </div>
       )}
 
-      <SummaryCards summary={summary} loading={loading} />
+      <SummaryCards
+        summary={summary}
+        loading={loading}
+        breakdown={summaryBreakdown}
+        transactionCount={totalTransactionCount}
+      />
+
+      <section className="dashboard-panel">
+        <div className="dashboard-panel__header">
+          <h2 className="dashboard-panel__title">Insights</h2>
+          <p className="dashboard-panel__subtitle">Key spending metrics at a glance</p>
+        </div>
+        <InsightsPanel insights={insights} loading={loading} />
+      </section>
 
       <div className="dashboard__main-grid">
         <section className="dashboard-panel dashboard-panel--form">
@@ -188,7 +255,10 @@ function Dashboard() {
             <h2 className="dashboard-panel__title">Add Expense</h2>
             <p className="dashboard-panel__subtitle">Record a new transaction</p>
           </div>
-          <ExpenseForm onExpenseCreated={handleDataChanged} />
+          <ExpenseForm
+            onExpenseCreated={handleDataChanged}
+            onShowToast={showToast}
+          />
         </section>
 
         <section className="dashboard-panel dashboard-panel--chart">
@@ -213,16 +283,35 @@ function Dashboard() {
       </section>
 
       <section className="dashboard-panel">
-        <div className="dashboard-panel__header">
-          <h2 className="dashboard-panel__title">All Expenses</h2>
-          <p className="dashboard-panel__subtitle">Manage your transactions</p>
+        <div className="dashboard-panel__header dashboard-panel__header--row">
+          <div>
+            <h2 className="dashboard-panel__title">All Expenses</h2>
+            <p className="dashboard-panel__subtitle">Manage your transactions</p>
+          </div>
+          <button
+            type="button"
+            className="dashboard__export-btn"
+            onClick={handleExportCsv}
+            disabled={loading || !expenses.length}
+          >
+            Export CSV
+          </button>
         </div>
         <ExpenseList
           expenses={expenses}
           loading={loading}
           onExpenseChanged={handleDataChanged}
           onRetry={() => fetchDashboardData(filters)}
+          onShowToast={showToast}
         />
+      </section>
+
+      <section className="dashboard-panel">
+        <div className="dashboard-panel__header">
+          <h2 className="dashboard-panel__title">Monthly Spending Trend</h2>
+          <p className="dashboard-panel__subtitle">Track spending patterns over time</p>
+        </div>
+        <MonthlyTrendChart data={monthlyTrend} loading={loading} />
       </section>
 
       <div className="dashboard__analytics-grid">

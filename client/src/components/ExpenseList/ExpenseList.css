@@ -119,6 +119,10 @@
   background: rgba(15, 23, 42, 0.35);
 }
 
+.expense-list__table-wrap--loading {
+  opacity: 0.85;
+}
+
 .expense-list__table {
   width: 100%;
   border-collapse: collapse;
