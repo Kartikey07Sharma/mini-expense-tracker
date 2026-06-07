@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { getExpenses, updateExpense, deleteExpense } from '../../api/expenseApi';
+import { useEffect, useRef, useState } from 'react';
+import { updateExpense, deleteExpense } from '../../api/expenseApi';
 import { formatCurrency } from '../../utils/formatCurrency';
 import './ExpenseList.css';
 
@@ -282,45 +282,19 @@ function DeleteModal({ expense, onClose, onConfirm, deleting }) {
   );
 }
 
-function ExpenseList({ onExpenseChanged }) {
-  const [expenses, setExpenses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+function ExpenseList({
+  expenses = [],
+  loading = false,
+  error = '',
+  onExpenseChanged,
+  onRetry,
+}) {
   const [successMessage, setSuccessMessage] = useState('');
+  const [actionError, setActionError] = useState('');
   const [editingExpense, setEditingExpense] = useState(null);
   const [deletingExpense, setDeletingExpense] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const successTimeoutRef = useRef(null);
-
-  const fetchExpenses = useCallback(async (silent = false) => {
-    if (!silent) {
-      setLoading(true);
-    }
-
-    setError('');
-
-    try {
-      const data = await getExpenses();
-
-      if (data.success) {
-        setExpenses(data.data || []);
-      } else {
-        setError(data.message || 'Failed to load expenses.');
-      }
-    } catch (err) {
-      setError(
-        err.response?.data?.message || 'Unable to load expenses. Please try again.',
-      );
-    } finally {
-      if (!silent) {
-        setLoading(false);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchExpenses();
-  }, [fetchExpenses]);
 
   useEffect(() => {
     return () => {
@@ -343,10 +317,9 @@ function ExpenseList({ onExpenseChanged }) {
     }, 3000);
   };
 
-  const handleUpdateSuccess = async (message) => {
+  const handleUpdateSuccess = (message) => {
     setEditingExpense(null);
     showSuccessMessage(message);
-    await fetchExpenses(true);
     onExpenseChanged?.();
   };
 
@@ -354,6 +327,7 @@ function ExpenseList({ onExpenseChanged }) {
     if (!deletingExpense) return;
 
     setDeleting(true);
+    setActionError('');
 
     try {
       const data = await deleteExpense(deletingExpense.id);
@@ -361,14 +335,13 @@ function ExpenseList({ onExpenseChanged }) {
       if (data.success) {
         setDeletingExpense(null);
         showSuccessMessage(data.message || 'Expense deleted successfully.');
-        await fetchExpenses(true);
         onExpenseChanged?.();
       } else {
-        setError(data.message || 'Failed to delete expense.');
+        setActionError(data.message || 'Failed to delete expense.');
         setDeletingExpense(null);
       }
     } catch (err) {
-      setError(
+      setActionError(
         err.response?.data?.message || 'Something went wrong. Please try again.',
       );
       setDeletingExpense(null);
@@ -376,6 +349,8 @@ function ExpenseList({ onExpenseChanged }) {
       setDeleting(false);
     }
   };
+
+  const displayError = actionError || error;
 
   if (loading) {
     return (
@@ -434,21 +409,23 @@ function ExpenseList({ onExpenseChanged }) {
         </div>
       )}
 
-      {error && (
+      {displayError && (
         <div className="expense-list__banner expense-list__banner--error" role="alert">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
             <circle cx="12" cy="12" r="10" />
             <line x1="12" y1="8" x2="12" y2="12" />
             <line x1="12" y1="16" x2="12.01" y2="16" />
           </svg>
-          <span>{error}</span>
-          <button type="button" className="expense-list__banner-btn" onClick={fetchExpenses}>
-            Retry
-          </button>
+          <span>{displayError}</span>
+          {onRetry && !actionError && (
+            <button type="button" className="expense-list__banner-btn" onClick={onRetry}>
+              Retry
+            </button>
+          )}
         </div>
       )}
 
-      {!error && expenses.length === 0 ? (
+      {!displayError && expenses.length === 0 ? (
         <div className="expense-list__empty">
           <div className="expense-list__empty-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -464,7 +441,7 @@ function ExpenseList({ onExpenseChanged }) {
           </p>
         </div>
       ) : (
-        !error && (
+        !displayError && (
           <div className="expense-list__table-wrap">
             <table className="expense-list__table">
               <thead>

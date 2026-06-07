@@ -3,12 +3,24 @@ import { getExpenseSummary, getExpenses } from '../api/expenseApi';
 import SummaryCards from '../components/SummaryCards/SummaryCards';
 import ExpenseForm from '../components/ExpenseForm/ExpenseForm';
 import ExpenseList from '../components/ExpenseList/ExpenseList';
+import Filters from '../components/Filters/Filters';
+import ExpensePieChart from '../components/Charts/ExpensePieChart';
+import ExpenseBarChart from '../components/Charts/ExpenseBarChart';
+import RecentTimeline from '../components/RecentTimeline/RecentTimeline';
+import {
+  INITIAL_FILTERS,
+  buildApiFilters,
+  buildCategoryBreakdown,
+  getRecentExpenses,
+  hasActiveFilters,
+} from '../utils/expenseUtils';
 import './Dashboard.css';
 
 function Dashboard() {
   const [summary, setSummary] = useState(null);
-  const [expenseCount, setExpenseCount] = useState(0);
-  const [summaryLoading, setSummaryLoading] = useState(true);
+  const [expenses, setExpenses] = useState([]);
+  const [filters, setFilters] = useState(INITIAL_FILTERS);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const currentDate = useMemo(
@@ -22,14 +34,17 @@ function Dashboard() {
     [],
   );
 
-  const fetchDashboardData = useCallback(async () => {
-    setSummaryLoading(true);
+  const fetchDashboardData = useCallback(async (activeFilters = filters, silent = false) => {
+    if (!silent) {
+      setLoading(true);
+    }
+
     setError(null);
 
     try {
       const [summaryData, expensesData] = await Promise.all([
         getExpenseSummary(),
-        getExpenses(),
+        getExpenses(buildApiFilters(activeFilters)),
       ]);
 
       if (summaryData.success) {
@@ -39,7 +54,9 @@ function Dashboard() {
       }
 
       if (expensesData.success) {
-        setExpenseCount(expensesData.count ?? expensesData.data?.length ?? 0);
+        setExpenses(expensesData.data || []);
+      } else {
+        setError((prev) => prev || expensesData.message || 'Failed to load expenses.');
       }
     } catch (err) {
       const message =
@@ -48,13 +65,47 @@ function Dashboard() {
 
       setError(message);
     } finally {
-      setSummaryLoading(false);
+      if (!silent) {
+        setLoading(false);
+      }
     }
-  }, []);
+  }, [filters]);
 
   useEffect(() => {
-    fetchDashboardData();
-  }, [fetchDashboardData]);
+    fetchDashboardData(filters);
+  }, [filters, fetchDashboardData]);
+
+  const handleFilterChange = (name, value) => {
+    setFilters((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleClearFilters = () => {
+    setFilters(INITIAL_FILTERS);
+  };
+
+  const handleDataChanged = () => {
+    fetchDashboardData(filters, true);
+  };
+
+  const expenseCount = expenses.length;
+
+  const chartBreakdown = useMemo(() => {
+    if (hasActiveFilters(filters)) {
+      return buildCategoryBreakdown(expenses);
+    }
+
+    return summary?.categoryBreakdown || buildCategoryBreakdown(expenses);
+  }, [expenses, summary, filters]);
+
+  const timelineExpenses = useMemo(() => {
+    if (hasActiveFilters(filters)) {
+      return getRecentExpenses(expenses);
+    }
+
+    return summary?.recentExpenses?.length
+      ? summary.recentExpenses
+      : getRecentExpenses(expenses);
+  }, [expenses, summary, filters]);
 
   return (
     <div className="dashboard">
@@ -83,16 +134,18 @@ function Dashboard() {
           <div className="dashboard-hero__stats">
             <div className="dashboard-hero__stat">
               <span className="dashboard-hero__stat-value">
-                {summaryLoading ? '—' : expenseCount}
+                {loading ? '—' : expenseCount}
               </span>
-              <span className="dashboard-hero__stat-label">Total Expenses Recorded</span>
+              <span className="dashboard-hero__stat-label">
+                {hasActiveFilters(filters)
+                  ? 'Filtered Expenses'
+                  : 'Total Expenses Recorded'}
+              </span>
             </div>
             <div className="dashboard-hero__stat-divider" aria-hidden="true" />
             <div className="dashboard-hero__stat">
               <span className="dashboard-hero__stat-value">
-                {summaryLoading
-                  ? '—'
-                  : summary?.categoryBreakdown?.length ?? 0}
+                {loading ? '—' : chartBreakdown.length}
               </span>
               <span className="dashboard-hero__stat-label">Active Categories</span>
             </div>
@@ -117,13 +170,17 @@ function Dashboard() {
             </svg>
             <p>{error}</p>
           </div>
-          <button type="button" className="dashboard__alert-btn" onClick={fetchDashboardData}>
+          <button
+            type="button"
+            className="dashboard__alert-btn"
+            onClick={() => fetchDashboardData(filters)}
+          >
             Retry
           </button>
         </div>
       )}
 
-      <SummaryCards summary={summary} loading={summaryLoading} />
+      <SummaryCards summary={summary} loading={loading} />
 
       <div className="dashboard__main-grid">
         <section className="dashboard-panel dashboard-panel--form">
@@ -131,15 +188,15 @@ function Dashboard() {
             <h2 className="dashboard-panel__title">Add Expense</h2>
             <p className="dashboard-panel__subtitle">Record a new transaction</p>
           </div>
-          <ExpenseForm onExpenseCreated={fetchDashboardData} />
+          <ExpenseForm onExpenseCreated={handleDataChanged} />
         </section>
 
         <section className="dashboard-panel dashboard-panel--chart">
           <div className="dashboard-panel__header">
-            <h2 className="dashboard-panel__title">Expense Breakdown</h2>
+            <h2 className="dashboard-panel__title">Expense Distribution</h2>
             <p className="dashboard-panel__subtitle">Category-wise spending</p>
           </div>
-          <p className="dashboard__placeholder-text">Pie chart coming next</p>
+          <ExpensePieChart data={chartBreakdown} loading={loading} />
         </section>
       </div>
 
@@ -148,7 +205,11 @@ function Dashboard() {
           <h2 className="dashboard-panel__title">Filters</h2>
           <p className="dashboard-panel__subtitle">Refine your expense view</p>
         </div>
-        <p className="dashboard__placeholder-text">Filter toolbar coming next</p>
+        <Filters
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          onClearFilters={handleClearFilters}
+        />
       </section>
 
       <section className="dashboard-panel">
@@ -156,7 +217,12 @@ function Dashboard() {
           <h2 className="dashboard-panel__title">All Expenses</h2>
           <p className="dashboard-panel__subtitle">Manage your transactions</p>
         </div>
-        <ExpenseList onExpenseChanged={fetchDashboardData} />
+        <ExpenseList
+          expenses={expenses}
+          loading={loading}
+          onExpenseChanged={handleDataChanged}
+          onRetry={() => fetchDashboardData(filters)}
+        />
       </section>
 
       <div className="dashboard__analytics-grid">
@@ -165,15 +231,15 @@ function Dashboard() {
             <h2 className="dashboard-panel__title">Category Distribution</h2>
             <p className="dashboard-panel__subtitle">Spending by category</p>
           </div>
-          <p className="dashboard__placeholder-text">Analytics pie chart coming next</p>
+          <ExpensePieChart data={chartBreakdown} loading={loading} />
         </section>
 
         <section className="dashboard-panel">
           <div className="dashboard-panel__header">
-            <h2 className="dashboard-panel__title">Spending Comparison</h2>
+            <h2 className="dashboard-panel__title">Category Comparison</h2>
             <p className="dashboard-panel__subtitle">Category totals at a glance</p>
           </div>
-          <p className="dashboard__placeholder-text">Bar chart coming next</p>
+          <ExpenseBarChart data={chartBreakdown} loading={loading} />
         </section>
       </div>
 
@@ -182,7 +248,7 @@ function Dashboard() {
           <h2 className="dashboard-panel__title">Recent Activity</h2>
           <p className="dashboard-panel__subtitle">Your latest transactions</p>
         </div>
-        <p className="dashboard__placeholder-text">Timeline coming next</p>
+        <RecentTimeline expenses={timelineExpenses} loading={loading} />
       </section>
     </div>
   );

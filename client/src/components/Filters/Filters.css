@@ -1,0 +1,110 @@
+.filters {
+  width: 100%;
+}
+
+.filters__grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr auto;
+  gap: 1rem;
+  align-items: end;
+}
+
+.filters__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filters__label {
+  color: var(--color-text);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.filters__input {
+  width: 100%;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.45);
+  color: var(--color-text);
+  font-size: 0.9375rem;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.filters__input:hover {
+  border-color: rgba(139, 92, 246, 0.4);
+  background: rgba(15, 23, 42, 0.6);
+}
+
+.filters__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.18);
+  background: rgba(15, 23, 42, 0.65);
+}
+
+.filters__select {
+  appearance: none;
+  padding-right: 2.25rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.875rem center;
+  cursor: pointer;
+}
+
+.filters__select option {
+  background: var(--color-card);
+  color: var(--color-text);
+}
+
+.filters__actions {
+  display: flex;
+  align-items: end;
+}
+
+.filters__clear-btn {
+  padding: 0.75rem 1.125rem;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.45);
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.filters__clear-btn:hover {
+  border-color: rgba(139, 92, 246, 0.35);
+  background: rgba(139, 92, 246, 0.12);
+  color: var(--color-text);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 1024px) {
+  .filters__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .filters__actions {
+    grid-column: 1 / -1;
+  }
+
+  .filters__clear-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .filters__grid {
+    grid-template-columns: 1fr;
+  }
+}

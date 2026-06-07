@@ -1,0 +1,117 @@
+.charts {
+  width: 100%;
+  min-height: 280px;
+}
+
+.charts--loading,
+.charts--empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 280px;
+}
+
+.charts__skeleton {
+  border-radius: 12px;
+  background: linear-gradient(
+    90deg,
+    rgba(51, 65, 85, 0.35) 25%,
+    rgba(51, 65, 85, 0.6) 50%,
+    rgba(51, 65, 85, 0.35) 75%
+  );
+  background-size: 200% 100%;
+  animation: charts-shimmer 1.5s infinite;
+}
+
+.charts__skeleton--pie {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+}
+
+.charts__skeleton--bar {
+  width: 100%;
+  height: 220px;
+}
+
+@keyframes charts-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.charts__empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin-bottom: 0.875rem;
+  border-radius: 14px;
+  background: rgba(139, 92, 246, 0.12);
+  color: var(--color-primary);
+}
+
+.charts__empty-icon svg {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.charts__empty-title {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.charts-tooltip {
+  padding: 0.625rem 0.875rem;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-card);
+  box-shadow: var(--shadow-md);
+}
+
+.charts-tooltip__label {
+  margin: 0 0 0.25rem;
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.charts-tooltip__value {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.charts-legend__label {
+  color: var(--color-text-secondary) !important;
+  font-size: 0.8125rem !important;
+}
+
+.charts-center-label {
+  fill: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.charts-center-value {
+  fill: var(--color-text);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.recharts-default-legend {
+  padding-top: 0.5rem !important;
+}
+
+.recharts-legend-item-text {
+  color: var(--color-text-secondary) !important;
+}
