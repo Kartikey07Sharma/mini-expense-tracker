@@ -8,12 +8,28 @@ const escapeCsvValue = (value) => {
   return stringValue;
 };
 
-export const exportExpensesToCsv = (expenses, filename = 'expenses.csv') => {
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+
+  const date = new Date(dateString);
+
+  return `${String(date.getDate()).padStart(2, '0')}-${String(
+    date.getMonth() + 1
+  ).padStart(2, '0')}-${date.getFullYear()}`;
+};
+
+export const exportExpensesToCsv = (
+  expenses,
+  filename = `paytrack-expenses-${new Date()
+    .toISOString()
+    .split('T')[0]}.csv`
+) => {
   const headers = ['Amount', 'Category', 'Date', 'Note'];
+
   const rows = expenses.map((expense) => [
     expense.amount,
     expense.category,
-    expense.date,
+    formatDate(expense.date),
     expense.note || '',
   ]);
 
@@ -27,12 +43,15 @@ export const exportExpensesToCsv = (expenses, filename = 'expenses.csv') => {
   });
 
   const url = URL.createObjectURL(blob);
+
   const link = document.createElement('a');
   link.href = url;
   link.download = filename;
   link.style.display = 'none';
+
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+
   URL.revokeObjectURL(url);
 };
