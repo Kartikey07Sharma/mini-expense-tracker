@@ -1,13 +1,12 @@
-export const CHART_COLORS = [
-  '#8B5CF6',
-  '#6366F1',
-  '#A78BFA',
-  '#818CF8',
-  '#C4B5FD',
-  '#7C3AED',
-  '#4F46E5',
-  '#DDD6FE',
-];
-
-export const getCategoryColor = (index) =>
-  CHART_COLORS[index % CHART_COLORS.length];
+export const CATEGORY_COLORS = {
+  Food: '#ef3232',          // Red
+  Transport: '#3B82F6',     // Blue
+  Shopping: '#F59E0B',      // Orange
+  Entertainment: '#A855F7', // Purple
+  Bills: '#4d2004',         // Brown
+  Health: '#22C55E',        // Green
+  Education: '#EC4899',     // Pink
+  Other: '#64748B',         // Slate Gray
+};
+export const getCategoryColor = (category) =>
+  CATEGORY_COLORS[category] || '#8B5CF6';

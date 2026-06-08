@@ -63,7 +63,10 @@ function ExpensePieChart({ data, loading }) {
             animationDuration={800}
           >
             {data.map((entry, index) => (
-              <Cell key={entry.category} fill={getCategoryColor(index)} />
+              <Cell
+                key={entry.category}
+                fill={getCategoryColor(entry.category)}
+              />
             ))}
           </Pie>
           <Tooltip content={renderTooltip} />
