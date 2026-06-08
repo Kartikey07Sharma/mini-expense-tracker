@@ -40,7 +40,7 @@ function EditModal({ expense, onClose, onSaved }) {
   const [form, setForm] = useState({
     amount: String(expense.amount),
     category: expense.category,
-    date: expense.date,
+    date: expense.date?.split('T')[0] || expense.date,
     note: expense.note || '',
   });
   const [errors, setErrors] = useState({});
@@ -74,11 +74,7 @@ function EditModal({ expense, onClose, onSaved }) {
     if (!form.date) {
       nextErrors.date = 'Date is required.';
     } else {
-      const selectedDate = new Date(form.date);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      if (selectedDate > today) {
+      if (form.date > getTodayDate()) {
         nextErrors.date = 'Future dates are not allowed.';
       }
     }
@@ -138,9 +134,8 @@ function EditModal({ expense, onClose, onSaved }) {
 
           <div className="expense-list-modal__grid">
             <div
-              className={`expense-list-modal__field ${
-                errors.amount ? 'expense-list-modal__field--error' : ''
-              }`}
+              className={`expense-list-modal__field ${errors.amount ? 'expense-list-modal__field--error' : ''
+                }`}
             >
               <label htmlFor="edit-amount">Amount *</label>
               <input
@@ -158,9 +153,8 @@ function EditModal({ expense, onClose, onSaved }) {
             </div>
 
             <div
-              className={`expense-list-modal__field ${
-                errors.category ? 'expense-list-modal__field--error' : ''
-              }`}
+              className={`expense-list-modal__field ${errors.category ? 'expense-list-modal__field--error' : ''
+                }`}
             >
               <label htmlFor="edit-category">Category *</label>
               <select
@@ -181,9 +175,8 @@ function EditModal({ expense, onClose, onSaved }) {
             </div>
 
             <div
-              className={`expense-list-modal__field ${
-                errors.date ? 'expense-list-modal__field--error' : ''
-              }`}
+              className={`expense-list-modal__field ${errors.date ? 'expense-list-modal__field--error' : ''
+                }`}
             >
               <label htmlFor="edit-date">Date *</label>
               <input
