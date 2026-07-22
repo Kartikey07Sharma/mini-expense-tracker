@@ -1,20 +1,22 @@
 const validateCreateExpense = (req, res, next) => {
     const { amount, category, date } = req.body;
 
-    if (!amount) {
+    // Amount validation
+    if (amount === undefined || amount === null || amount === "") {
         return res.status(400).json({
             success: false,
             message: "Amount is required"
         });
     }
 
-    if (amount <= 0) {
+    if (Number(amount) <= 0) {
         return res.status(400).json({
             success: false,
             message: "Amount must be greater than zero"
         });
     }
 
+    // Category validation
     if (!category || category.trim() === "") {
         return res.status(400).json({
             success: false,
@@ -22,6 +24,7 @@ const validateCreateExpense = (req, res, next) => {
         });
     }
 
+    // Date validation
     if (!date) {
         return res.status(400).json({
             success: false,
@@ -32,9 +35,6 @@ const validateCreateExpense = (req, res, next) => {
     const todayString = new Date().toLocaleDateString("en-CA", {
         timeZone: "Asia/Kolkata"
     });
-
-    console.log("Received Date:", date);
-    console.log("Today String:", todayString);
 
     if (date > todayString) {
         return res.status(400).json({

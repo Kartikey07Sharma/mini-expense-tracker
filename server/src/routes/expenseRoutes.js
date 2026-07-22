@@ -2,9 +2,11 @@ const express = require("express");
 
 const router = express.Router();
 
+// Middleware
 const validateCreateExpense = require("../middleware/validateCreateExpense");
 const validateUpdateExpense = require("../middleware/validateUpdateExpense");
 
+// Controllers
 const {
     createExpense,
     getExpenses,
@@ -13,36 +15,21 @@ const {
     getExpenseSummary
 } = require("../controllers/expenseController");
 
-// Create Expense
-router.post(
-    "/",
-    validateCreateExpense,
-    createExpense
-);
+// ================= Expense Routes =================
 
-// Expense Summary
-router.get(
-    "/summary",
-    getExpenseSummary
-);
+// Create Expense
+router.post("/", validateCreateExpense, createExpense);
+
+// Get Expense Summary
+router.get("/summary", getExpenseSummary);
 
 // Get All Expenses
-router.get(
-    "/",
-    getExpenses
-);
+router.get("/", getExpenses);
 
 // Update Expense
-router.put(
-    "/:id",
-    validateUpdateExpense,
-    updateExpense
-);
+router.put("/:id", validateUpdateExpense, updateExpense);
 
 // Delete Expense
-router.delete(
-    "/:id",
-    deleteExpense
-);
+router.delete("/:id", deleteExpense);
 
 module.exports = router;

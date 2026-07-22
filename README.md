@@ -4,7 +4,7 @@
 
 PayTrack is a full-stack expense tracking and analytics application built as a solution for **Exercise 2: Mini Expense Tracker** from the Studio Graphene Full Stack Developer Assessment.
 
-The application allows users to record daily expenses, categorize spending, edit and delete transactions, apply filters, analyze spending patterns through charts and KPIs, and export records as CSV files. The project demonstrates full-stack development concepts including REST API design, frontend-backend integration, SQLite database management, data visualization, validation, responsive UI design, and deployment.
+The application allows users to record daily expenses, categorize spending, edit and delete transactions, apply filters, analyze spending patterns through charts and KPIs, and export records as CSV files. The project demonstrates full-stack development concepts including REST API design, frontend-backend integration, MySQL database management, data visualization, validation, responsive UI design, and deployment.
 
 ---
 
@@ -64,13 +64,13 @@ Used for building RESTful APIs and middleware handling.
 
 ## Database
 
-### SQLite
+### MySQL
 
-Lightweight relational database used for persistent expense storage.
+A robust relational database management system used for storing and managing expense records with reliable data persistence and efficient query performance.
 
-### better-sqlite3
+### mysql2
 
-Provides fast and simple SQLite integration with Node.js.
+A modern Node.js MySQL driver that provides efficient database connectivity with Promise support, enabling asynchronous CRUD operations and connection pooling.
 
 ---
 
@@ -96,7 +96,7 @@ Validation Middleware
 ↓
 Controller Layer
 ↓
-SQLite Database
+MYSQL Database
 
 ### Architecture Flow
 
@@ -397,7 +397,7 @@ Given more time, I would add:
 
 # Next Steps
 
-The current version focuses on fulfilling all core requirements and several bonus features including analytics dashboards, responsive design, SQLite persistence, CSV export, and interactive visualizations.
+The current version focuses on fulfilling all core requirements and several bonus features including analytics dashboards, responsive design, MYSQL persistence, CSV export, and interactive visualizations.
 
 The next development phase would focus on:
 
@@ -436,14 +436,14 @@ React was chosen because of its component-based architecture and efficient state
 
 Express provides a lightweight and flexible framework for creating RESTful APIs while keeping the codebase easy to understand.
 
-## Why SQLite?
+## Why MySQL?
 
-SQLite was selected because:
+MySQL was selected because:
 
-- No external database setup is required
-- Perfect for small-scale applications
-- Persistent storage without additional infrastructure
-- Easy deployment and portability
+- Reliable and scalable relational database for production applications
+- Supports multiple concurrent users and efficient data management
+- Provides better performance and security than file-based databases
+- Widely used in the industry, making it suitable for real-world development
 
 ## Why Recharts?
 
@@ -525,7 +525,7 @@ Several optimizations were implemented to improve user experience:
 - Responsive chart rendering
 - Loading skeleton placeholders
 - API abstraction through Axios
-- Optimized SQLite queries
+- Optimized SQL queries
 - Dynamic filtering without page reloads
 - Efficient dashboard refresh after CRUD operations
 
@@ -651,7 +651,7 @@ Developing PayTrack provided practical experience in:
 - Designing RESTful APIs
 - Building reusable React components
 - Managing application state
-- SQLite database integration
+- MYSQL database integration
 - Data visualization using Recharts
 - Deployment using Vercel and Render
 - Debugging production issues

@@ -1,83 +1,68 @@
 const db = require("../database/db");
 
-const createExpense = (req, res) => {
+// ================= CREATE EXPENSE =================
+const createExpense = async (req, res) => {
     try {
         const { amount, category, date, note } = req.body;
 
-        const statement = db.prepare(`
-  INSERT INTO expenses (
-    amount,
-    category,
-    date,
-    note
-  )
-  VALUES (?, ?, ?, ?)
-`);
-
-        const result = statement.run(
-            amount,
-            category,
-            date,
-            note || null
+        const [result] = await db.execute(
+            `INSERT INTO expenses
+            (amount, category, date, note)
+            VALUES (?, ?, ?, ?)`,
+            [amount, category, date, note || null]
         );
+
+        console.log("Insert Result:", result);
+        console.log("Inserted ID:", result.insertId);
+        console.log("Affected Rows:", result.affectedRows);
 
         res.status(201).json({
             success: true,
             message: "Expense created successfully",
-            expenseId: result.lastInsertRowid
+            expenseId: result.insertId
         });
-
 
     } catch (error) {
         console.error(error);
-
 
         res.status(500).json({
             success: false,
             message: "Failed to create expense"
         });
-
-
     }
 };
 
-const getExpenses = (req, res) => {
+// ================= GET EXPENSES =================
+const getExpenses = async (req, res) => {
     try {
-
-        const {
-            category,
-            startDate,
-            endDate
-        } = req.query;
+        const { category, startDate, endDate } = req.query;
 
         let query = `
             SELECT *
             FROM expenses
-            WHERE 1=1
+            WHERE 1 = 1
         `;
 
         const params = [];
 
         if (category) {
-            query += ` AND category = ?`;
+            query += " AND category = ?";
             params.push(category);
         }
 
         if (startDate) {
-            query += ` AND date >= ?`;
+            query += " AND date >= ?";
             params.push(startDate);
         }
 
         if (endDate) {
-            query += ` AND date <= ?`;
+            query += " AND date <= ?";
             params.push(endDate);
         }
 
-        query += ` ORDER BY date DESC`;
+        query += " ORDER BY date DESC";
 
-        const expenses = db
-            .prepare(query)
-            .all(...params);
+        const [expenses] = await db.execute(query, params);
 
         res.status(200).json({
             success: true,
@@ -100,35 +85,24 @@ const getExpenses = (req, res) => {
     }
 };
 
-const updateExpense = (req, res) => {
+// ================= UPDATE EXPENSE =================
+const updateExpense = async (req, res) => {
     try {
         const { id } = req.params;
+        const { amount, category, date, note } = req.body;
 
-        const {
-            amount,
-            category,
-            date,
-            note
-        } = req.body;
-
-        const result = db.prepare(`
-      UPDATE expenses
-      SET
-        amount = ?,
-        category = ?,
-        date = ?,
-        note = ?,
-        updated_at = CURRENT_TIMESTAMP
-      WHERE id = ?
-    `).run(
-            amount,
-            category,
-            date,
-            note || null,
-            id
+        const [result] = await db.execute(
+            `UPDATE expenses
+             SET amount = ?,
+                 category = ?,
+                 date = ?,
+                 note = ?,
+                 updated_at = CURRENT_TIMESTAMP
+             WHERE id = ?`,
+            [amount, category, date, note || null, id]
         );
 
-        if (result.changes === 0) {
+        if (result.affectedRows === 0) {
             return res.status(404).json({
                 success: false,
                 message: "Expense not found"
@@ -150,16 +124,17 @@ const updateExpense = (req, res) => {
     }
 };
 
-const deleteExpense = (req, res) => {
+// ================= DELETE EXPENSE =================
+const deleteExpense = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const result = db.prepare(`
-      DELETE FROM expenses
-      WHERE id = ?
-    `).run(id);
+        const [result] = await db.execute(
+            "DELETE FROM expenses WHERE id = ?",
+            [id]
+        );
 
-        if (result.changes === 0) {
+        if (result.affectedRows === 0) {
             return res.status(404).json({
                 success: false,
                 message: "Expense not found"
@@ -181,39 +156,39 @@ const deleteExpense = (req, res) => {
     }
 };
 
-const getExpenseSummary = (req, res) => {
+// ================= SUMMARY =================
+const getExpenseSummary = async (req, res) => {
     try {
 
-        const totalExpenses = db.prepare(`
-            SELECT COALESCE(SUM(amount), 0) AS total
-            FROM expenses
-        `).get();
+        const [[totalExpenses]] = await db.execute(
+            `SELECT COALESCE(SUM(amount),0) AS total
+             FROM expenses`
+        );
 
-        const highestExpense = db.prepare(`
-            SELECT COALESCE(MAX(amount), 0) AS highest
-            FROM expenses
-        `).get();
+        const [[highestExpense]] = await db.execute(
+            `SELECT COALESCE(MAX(amount),0) AS highest
+             FROM expenses`
+        );
 
-        const averageExpense = db.prepare(`
-            SELECT COALESCE(AVG(amount), 0) AS average
-            FROM expenses
-        `).get();
+        const [[averageExpense]] = await db.execute(
+            `SELECT COALESCE(AVG(amount),0) AS average
+             FROM expenses`
+        );
 
-        const categoryBreakdown = db.prepare(`
-            SELECT
-                category,
-                SUM(amount) AS total
-            FROM expenses
-            GROUP BY category
-            ORDER BY total DESC
-        `).all();
+        const [categoryBreakdown] = await db.execute(
+            `SELECT category,
+                    SUM(amount) AS total
+             FROM expenses
+             GROUP BY category
+             ORDER BY total DESC`
+        );
 
-        const recentExpenses = db.prepare(`
-            SELECT *
-            FROM expenses
-            ORDER BY created_at DESC
-            LIMIT 5
-        `).all();
+        const [recentExpenses] = await db.execute(
+            `SELECT *
+             FROM expenses
+             ORDER BY created_at DESC
+             LIMIT 5`
+        );
 
         res.status(200).json({
             success: true,
@@ -237,9 +212,9 @@ const getExpenseSummary = (req, res) => {
 };
 
 module.exports = {
-  createExpense,
-  getExpenses,
-  updateExpense,
-  deleteExpense,
-  getExpenseSummary
+    createExpense,
+    getExpenses,
+    updateExpense,
+    deleteExpense,
+    getExpenseSummary
 };

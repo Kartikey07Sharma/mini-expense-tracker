@@ -5,11 +5,11 @@ import {
   PieChart,
   ResponsiveContainer,
   Tooltip,
-} from 'recharts';
-import { formatCurrency } from '../../utils/formatCurrency';
-import EmptyState from '../EmptyState/EmptyState';
-import { getCategoryColor } from './chartConstants';
-import './Charts.css';
+} from "recharts";
+import { formatCurrency } from "../../utils/formatCurrency";
+import EmptyState from "../EmptyState/EmptyState";
+import { getCategoryColor } from "./chartConstants";
+import "./Charts.css";
 
 const renderTooltip = ({ active, payload }) => {
   if (!active || !payload?.length) return null;
@@ -44,14 +44,22 @@ function ExpensePieChart({ data, loading }) {
     );
   }
 
-  const total = data.reduce((sum, item) => sum + Number(item.total), 0);
+  // Convert MySQL DECIMAL strings into numbers
+  const chartData = data.map((item) => ({
+    ...item,
+    total: Number(item.total),
+  }));
+
+  console.log("Pie Chart Data:", chartData);
+
+  const total = chartData.reduce((sum, item) => sum + item.total, 0);
 
   return (
     <div className="charts">
       <ResponsiveContainer width="100%" height={280}>
         <PieChart>
           <Pie
-            data={data}
+            data={chartData}
             dataKey="total"
             nameKey="category"
             cx="50%"
@@ -61,15 +69,18 @@ function ExpensePieChart({ data, loading }) {
             paddingAngle={3}
             animationBegin={0}
             animationDuration={800}
+            isAnimationActive={true}
           >
-            {data.map((entry, index) => (
+            {chartData.map((entry) => (
               <Cell
                 key={entry.category}
                 fill={getCategoryColor(entry.category)}
               />
             ))}
           </Pie>
+
           <Tooltip content={renderTooltip} />
+
           <Legend
             verticalAlign="bottom"
             iconType="circle"
@@ -77,6 +88,7 @@ function ExpensePieChart({ data, loading }) {
               <span className="charts-legend__label">{value}</span>
             )}
           />
+
           <text
             x="50%"
             y="46%"
@@ -86,6 +98,7 @@ function ExpensePieChart({ data, loading }) {
           >
             Total
           </text>
+
           <text
             x="50%"
             y="54%"

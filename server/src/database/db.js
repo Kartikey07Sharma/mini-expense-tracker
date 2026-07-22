@@ -1,20 +1,26 @@
-const Database = require("better-sqlite3");
-const path = require("path");
+const mysql = require("mysql2/promise");
 
-const dbPath = path.join(__dirname, "../../expense-tracker.db");
+const pool = mysql.createPool({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT,
 
-const db = new Database(dbPath);
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+});
 
-db.exec(`  CREATE TABLE IF NOT EXISTS expenses (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    amount REAL NOT NULL,
-    category TEXT NOT NULL,
-    date TEXT NOT NULL,
-    note TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )`);
+(async () => {
+    try {
+        const connection = await pool.getConnection();
+        console.log("MySQL Connected Successfully");
+        connection.release();
+    } catch (err) {
+        console.error("MySQL Connection Failed");
+        console.error(err);
+    }
+})();
 
-console.log("✅ SQLite database connected");
-
-module.exports = db;
+module.exports = pool;

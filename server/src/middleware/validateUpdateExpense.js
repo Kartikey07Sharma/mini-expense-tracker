@@ -1,6 +1,7 @@
 const validateUpdateExpense = (req, res, next) => {
     const { amount, category, date } = req.body;
 
+    // At least one field should be present
     if (
         amount === undefined &&
         category === undefined &&
@@ -12,9 +13,11 @@ const validateUpdateExpense = (req, res, next) => {
         });
     }
 
+    // Amount validation
     if (
         amount !== undefined &&
-        amount <= 0
+        amount !== null &&
+        Number(amount) <= 0
     ) {
         return res.status(400).json({
             success: false,
@@ -22,6 +25,7 @@ const validateUpdateExpense = (req, res, next) => {
         });
     }
 
+    // Category validation
     if (
         category !== undefined &&
         category.trim() === ""
@@ -32,13 +36,11 @@ const validateUpdateExpense = (req, res, next) => {
         });
     }
 
+    // Date validation
     if (date) {
         const todayString = new Date().toLocaleDateString("en-CA", {
             timeZone: "Asia/Kolkata"
         });
-
-        console.log("Update Date:", date);
-        console.log("Today String:", todayString);
 
         if (date > todayString) {
             return res.status(400).json({
